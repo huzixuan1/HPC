@@ -149,3 +149,5 @@ int main()
     return 0;
 }
 
+// 编译命令：
+// g++ add_host.cpp -o add_host -framework OpenCL
