@@ -1,0 +1,15 @@
+{
+  "batch_binary": [
+    {
+      "kernel_file_path": ["cl/vector_add.cl"],
+      "kernel_entry_name": "vector_add",
+      "kernel_option": "",
+      "kernel_argument": [
+        { "i_buffer": ["int", "a"] },
+        { "i_buffer": ["int", "b"] },
+        { "o_buffer": ["int", "c"] },
+        { "param": ["int", "len"] }
+      ]
+    }
+  ]
+}
