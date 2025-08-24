@@ -24,6 +24,7 @@
   - 对比标量 vs NEON 性能
 - 参考
   - [ARM NEON Intrinsics](https://developer.arm.com/architectures/instruction-sets/simd-isas/neon/intrinsics)
+  - [ARM SIMD Introduction](https://blog.csdn.net/mzpmzk/article/details/114686930)
 
 ---
 
