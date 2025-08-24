@@ -96,3 +96,147 @@
 4. 阶段 3：探索高级向量化技巧
 5. 阶段 4：项目实战，巩固技能
 
+
+------
+
+`v<mod><opname><shape><flags>_<type>`
+`v vector，表示这是 NEON 向量操作`
+
+`<mod> 修饰符，对运算行为进行调整`
+
+`<opname> 运算类型，比如 add/sub/mul`
+
+`<shape> 输出向量长度变化或高低位处理`
+
+`<flags> 操作寄存器类型（D寄存器64-bit 或 Q寄存器128-bit）`
+
+`<type> 数据类型和元素类型`
+
+
+| 修饰符 | 含义               | 示例                                 |
+| --- | ---------------- | ---------------------------------- |
+| `q` | 饱和计算（saturating） | `vqadd_s8(a,b)` → 相加结果超过范围时饱和      |
+| `h` | 折半计算（halving）    | `vhsub_s8(a,b)` → 结果右移一位 `(a-b)/2` |
+| `d` | 加倍计算（doubling）   | `vqdmull_s16(a,b)` → 结果扩大两倍并做饱和    |
+| `r` | 舍入计算（rounding）   | `vrhadd_s8(a,b)` → `(a+b+1)/2`     |
+| `p` | pairwise 两两操作    | `vpadd_s8(a,b)` → 相邻元素两两相加         |
+
+| shape   | 含义                            | 示例                                              |
+| ------- | ----------------------------- | ----------------------------------------------- |
+| `l`     | long，输出元素长度 = 输入长度 × 2        | `vaddl_u8(a,b)` → uint8x8 → uint16x8            |
+| `w`     | wide，第一个向量与输出长度一致，第二个向量元素长度加倍 | `vsubw_u8(a,b)` → uint16x8 = uint16x8 - uint8x8 |
+| `n`     | narrow，输出长度 = 输入长度 ÷ 2        | `vmovn_u64(a)` → uint64x2 → uint32x2            |
+| `_high` | AArch64 专用，处理高64位             | `vsubl_high_s8(a,b)` → 高64bit参与运算               |
+| `_n`    | 标量参与向量计算                      | `vshr_n_s8(a, 3)` → a 向量每个元素右移 3 位              |
+| `_lane` | 指定某个通道参与计算                    | `vmul_lane_s16(a, v, 2)` → 取 v 第2通道和 a 向量相乘     |
+
+| flags | 含义                        |
+| ----- | ------------------------- |
+| `q`   | quad word → 128-bit 寄存器操作 |
+| 无     | D 寄存器 → 64-bit 寄存器操作      |
+
+| type             | 含义                   |
+| ---------------- | -------------------- |
+| `u8/u16/u32/u64` | 无符号整数 8/16/32/64 bit |
+| `s8/s16/s32/s64` | 有符号整数 8/16/32/64 bit |
+| `f16/f32/f64`    | 半/单/双精度浮点数           |
+
+```
+vadd_s32(a, b)       // 普通逐元素加法
+vqadd_s32(a, b)      // 饱和加法，溢出取最大值
+vaddl_s32(a, b)      // 长指令加法，输出元素位宽扩大
+vhadd_s32(a, b)      // 半加 (相加后右移1)
+vrhadd_s32(a, b)     // 舍入半加 ((a+b+1)>>1)
+vpadd_s8(a,b)        // 相邻 pairwise 相加
+vaddw_s32(a,b)       // 宽加法，b 被拓宽再加
+vaddhn_s32(a,b)      // 窄加法，输出元素位宽减半
+
+vsubq_s32(a,b)       // 普通减法
+vqsub_s32(a,b)       // 饱和减法
+vsubl_s32(a,b)       // 长指令减法
+vhsub_s32(a,b)       // 半减 (相减右移1)
+vsubw_s32(a,b)       // 宽减法
+vsubhn_s32(a,b)      // 窄减法
+
+vmul_s32(a,b)        // 元素逐个相乘
+vmull_s32(a,b)       // 长指令乘法
+vmul_n_s32(a,b)      // 与标量相乘
+vmul_lane_s32(a,b,c) // 与向量某个通道相乘
+vqdmulh_s32(a,b)     // 饱和乘法
+
+vmla_s32(a,b,c)        // a + b*c
+vmlal_s32(a,b,c)       // 长乘加
+vmls_s32(a,b,c)        // a - b*c
+vmlsl_s32(a,b,c)       // 长乘减
+
+vrecpe_f32(a)          // 近似倒数
+vrecps_f32(a,b)        // Newton-Raphson 步
+vrsqrts_f32(a,b)       // 近似平方根
+
+vneg_s32(a)             // 每个元素取负
+
+vrndn_f32(a)            // 四舍五入到最近偶数
+vrnda_f32(a)            // 四舍五入，tie away from zero
+vrndp_f32(a)            // 向 +∞
+vrndm_f32(a)            // 向 -∞
+vrnd_f32(a)             // 向 0
+
+vceq_s32(a,b)   // ==
+vcge_s32(a,b)   // >=
+vcle_s32(a,b)   // <=
+vcgt_s32(a,b)   // >
+vclt_s32(a,b)   // <
+vcage_f32(a,b)  // |a| >= |b|
+vcalt_f32(a,b)  // |a| < |b|
+vtst_s32(a,b)   // a & b != 0
+
+vabs_s32(a)     // |a|
+vabd_s32(a,b)   // |a-b|
+vaba_s32(a,b,c) // a + |b-c|
+
+vmax_s32(a,b)   // 元素间取大
+vmin_s32(a,b)   // 元素间取小
+vpmax_s32(a,b)  // 相邻 pairwise max
+vpmin_s32(a,b)  // 相邻 pairwise min
+
+vshlq_u16(a,b)    // 左移，可传负数表示右移
+vrshlq_u16(a,b)   // 左移 + 四舍五入
+vqshlq_u16(a,b)   // 饱和截断
+vshlq_n_u16(a,b)  // 按常数左移
+vshrq_n_u16(a,b)  // 按常数右移
+vsraq_n_u16(a,b,c) // 右移累加
+vsliq_n_u16(a,b,c) // 左移插入
+vsriq_n_u16(a,b,c) // 右移插入
+
+vmvn_s32(a)    // ~a
+vand_s32(a,b)  // a & b
+vorr_s32(a,b)  // a | b
+veor_s32(a,b)  // a ^ b
+vbic_s32(a,b)  // ~a & b
+vorn_s32(a,b)  // a | (~b)
+
+vcvtq_u32_f32(a)   // f32 → u32
+vcvtq_f32_u32(a)   // u32 → f32
+vcvt_f16_f32(a)    // f32 → f16
+vcvt_f32_f16(a)    // f16 → f32
+vmovl_s8(a)        // int8 → int16
+vqmovn_s16(a)      // int16 → int8 (饱和)
+vreinterpret_f32_u32(a) // 重新解释类型，不改变位
+
+vext_s8(a,b,c)   // 组合 a,b 向量，取 c 个元素偏移
+vtbl1_s8(a,b)    // 查表索引
+vtbl2_s8(a,b)    // 两个向量查表
+vtbx1_s8(a,b,c)  // 查表并替换
+vbsl_s8(mask,a,b)// mask 选择 a 或 b 的位
+
+vrev64_s8(a)  // 元素反转，64位粒度
+vrev32_s8(a)  // 元素反转，32位粒度
+vrev16_s8(a)  // 元素反转，16位粒度
+
+vtrn_s8(a,b)  // 交叉转置
+vzip_s8(a,b)  // 交叉排列
+vuzp_s8(a,b)  // 反交叉排列
+vcombine_u8(low,high)  // 两个 64bit → 一个 128bit
+vget_low_u8(a)          // 获取低半部分
+vget_high_u8(a)         // 获取高半部分
+```
