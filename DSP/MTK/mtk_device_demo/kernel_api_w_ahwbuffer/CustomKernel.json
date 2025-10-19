@@ -1,0 +1,36 @@
+{
+  "batch_binary" : [
+  {
+       "kernel_file_path" : [
+         "cl/CustomKernel.cl"
+        ],
+       "kernel_entry_name" : "CustomKernel",
+       "kernel_option" : "-lmtk_cv_library",
+       "kernel_argument" : [
+            {"buffer" : ["uchar", "prev_img"]},
+            {"buffer" : ["uchar", "next_img"]},
+            {"buffer" : ["float", "prev_pts"]},
+            {"buffer" : ["float", "next_pts"]},
+            {"buffer" : ["int", "pts_num"]},
+            {"buffer" : ["uchar", "status"]},
+            {"buffer" : ["uchar", "tmp_buf_lk"]},
+            {"buffer" : ["uint", "random_seed"]},
+            {"buffer" : ["float", "homography_matrix"]},
+            {"buffer" : ["uchar", "warp_result"]},
+            {"internal_buffer" : ["uchar", "tmp_buf", 400000]},
+            {"const_param" : ["uint", "ui_tmp_buf_size", 400000]},
+            {"param" : ["uint", "stride_img"]},
+            {"param" : ["uint", "width_img"]},
+            {"param" : ["uint", "height_img"]},
+            {"param" : ["uchar", "win_width"]},
+            {"param" : ["uchar", "win_height"]},
+            {"param" : ["uchar", "max_level"]},
+            {"param" : ["uint", "criteria_cnt"]},
+            {"param" : ["float", "criteria_eps"]},
+            {"param" : ["int", "max_iters"]},
+            {"param" : ["float", "threshold"]},
+            {"param" : ["float", "confidence"]}
+        ]
+  }
+  ]
+}
