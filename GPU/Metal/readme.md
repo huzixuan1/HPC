@@ -6,11 +6,11 @@
 #### 一、项目创建
 这步主要是创建Xcode Command Line Tool工程
 具体步骤如下所示：
-![](../imgs/img01.png)
+![](imgs/img01.png)
 
-![](../imgs/img02.png)
+![](imgs/img02.png)
 
-![](../imgs/img03.png)
+![](imgs/img03.png)
 
 #### 二、引入 Metal-C++
 资源文件请到该url中下载
@@ -32,8 +32,8 @@ zixhu@MacBook metalPro % tree -L 2
 
 #### 三、build参数配置
 配置如下所示：
-![](../imgs/img04.png)
-![](../imgs/img05.png)
+![](imgs/img04.png)
+![](imgs/img05.png)
 
 由于metal-cpp是从外部引入的第三方头文件，因此需要在 Xcode中进行基础的路径和框架配置，确保工程能够正常找到相关的API和系统库；
 
@@ -192,6 +192,6 @@ int main() {
 ```
 
 #### 六、编译&&运行
-![](../imgs/img06.png)
+![](imgs/img06.png)
 
 >由于笔者也是在学习过程中，因此难免有写的不严谨的地方，还请多多包涵！！
